@@ -97,6 +97,16 @@ squarely in dask's own documented 200 µs–1 ms range, confirming the cost is t
 scheduler, not the data. Multiply 63 ms by the many gathers Parcels issues per
 step across 480 steps and you recover the multi-thousand-second runtime.
 
+### Where the time actually goes
+
+[`../profiling/`](../profiling/) profiles this loop (cProfile + a VizTracer
+timeline trace). With the field in RAM, the self-time is almost entirely the
+**threaded scheduler's synchronization** — `threading` lock/condition
+`acquire`/`release`/`wait`/`notify` — as dask dispatches the ~120-task graph of
+each gather through its thread pool, plus per-`compute()` graph construction
+(`__dask_graph__`, `__dask_tokenize__`, `start_state_from_dask`). There is no
+array math in the hot path. See [`../profiling/README.md`](../profiling/README.md).
+
 ---
 
 ## Reducing the dask scheduling overhead

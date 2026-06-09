@@ -13,3 +13,9 @@
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+
+# Large / regenerable profiling artifacts -- keep the text summaries (cprofile_top.txt),
+# drop the multi-MB traces and binary profiles.
+profiling/results/*.json
+profiling/results/*.prof
+profiling/results/*.svg
