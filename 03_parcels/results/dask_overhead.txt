@@ -1,0 +1,8 @@
+sampling 2,000 scattered points from an in-RAM (60, 1000, 1000) field (no disk I/O)
+
+  numpy  isel().values    :      312.4 us / call
+  dask   isel().compute() :     63.412 ms / call  (120 tasks in the graph)
+  dask overhead factor    :        203 x
+
+  projected pure-dask overhead for 480 steps x 4 calls/step:
+    = (63.41 - 0.312) ms x 1920 calls = 121.2 s of scheduling alone

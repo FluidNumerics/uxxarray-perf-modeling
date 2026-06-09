@@ -1,0 +1,32 @@
+# Best-effort conda environment for running the benchmarks standalone.
+#
+#   conda env create -f environment.yml      # or: mamba env create -f ...
+#   conda activate uxxarray-perf-modeling
+#
+# Parcels v4 is an alpha and is installed from git below. The most reliable
+# environment is still the pixi env of a Parcels v4 checkout -- if you have one,
+# you can skip this file and run with:
+#   PARCELS_PYTHON=/path/to/parcels/.pixi/envs/default/bin/python ./run_all.sh
+#
+# `fio` is included here so stage 01 needs no system install; the scripts also
+# fall back to `pixi exec fio` or a system fio if present.
+name: uxxarray-perf-modeling
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - xarray >=2024.5
+  - dask >=2024.5
+  - netcdf4 >=1.6
+  - numpy >=2.1
+  - pandas >=2.2
+  - pyarrow >=20
+  - cf_xarray >=0.8.6
+  - zarr >=3
+  - pooch
+  - polars
+  - fio
+  - pip
+  - pip:
+      # Parcels v4 (alpha). Pulls its own deps (xgcm, uxarray, ...).
+      - "parcels @ git+https://github.com/Parcels-Code/Parcels.git"

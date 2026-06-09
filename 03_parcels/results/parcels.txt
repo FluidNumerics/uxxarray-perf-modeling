@@ -1,0 +1,7 @@
+=== Parcels structured-grid advection (data/flow.nc) ===
+   0%|          | [00:00<?, ?it/s]Integration time: 2000-01-01T00:00:00   0%|          | [00:00<?, ?it/s]Integration time: 2000-01-01T00:00:00   0%|          | [00:06<?, ?it/s]Integration time: 2000-01-01T00:00:00 100%|██████████| [00:06<00:00, 262613.93it/s]Integration time: 2000-01-01T00:00:00 100%|██████████| [00:06<00:00, 262605.07it/s]
+  in-memory (numpy)       :     6.59 s  (2000 particles x 480 steps = 960,000 advection steps, 145,637 steps/s)
+   0%|          | [00:00<?, ?it/s]Integration time: 2000-01-01T00:00:00   0%|          | [00:00<?, ?it/s]Integration time: 2000-01-01T00:00:00   0%|          | [35:55<?, ?it/s]Integration time: 2000-01-01T00:00:00 100%|██████████| [35:55<00:00, 801.50it/s]Integration time: 2000-01-01T00:00:00 100%|██████████| [35:55<00:00, 801.50it/s]
+  dask-backed (on-disk)   :  2155.97 s  (2000 particles x 480 steps = 960,000 advection steps, 445 steps/s)
+
+  dask-backed is 327.1x slower than in-memory for the identical simulation.

@@ -1,0 +1,22 @@
+file        : data/ocean_slab_10g.nc
+shape       : (129, 26, 400, 1000)  (time, depth, lat, lon)
+on-disk chunk: (1, 1, 400, 1000)  (3.200 MB each, 1 tiles/slab)
+workload    : 10,000 particles, 50 timesteps (2 time levels / step for interpolation)
+
+=== 1. RANDOM pointwise sampling off dask/disk -- the Parcels pattern [WARNING: cache NOT flushed -- wall-clock is cache-warm] ===
+    wall time            :      3.095 s
+    useful values        :     1,000,000  (    8.00 MB)
+    chunks fetched        :           100  (32 chunk-reads/s)
+    data dragged off disk:      320.0 MB  (   103.4 MB/s)
+    READ AMPLIFICATION   :       40.0 x
+    throughput (useful)  :      2.585 MB/s
+
+=== 2. LOAD-ONCE into RAM, then sample in RAM -- the fix ===
+    sequential load      :      1.196 s  (413 MB at 345 MB/s)
+    in-RAM indexing      :     0.0134 s
+    total                :      1.209 s
+
+=== summary ===
+  random-off-disk is    2.6x slower than load-once-then-sample
+  read amplification of the random pattern: 40.0x
+  (100 scattered chunk reads vs 129 sequential reads to stream the surface once)

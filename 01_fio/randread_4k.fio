@@ -1,0 +1,20 @@
+# Small-block (4 KiB) random read with O_DIRECT. This is the pathological case:
+# every I/O lands at an unpredictable offset, so the device pays full seek /
+# latency cost per request and cannot prefetch. Time-bounded so it samples
+# achievable IOPS without having to read the entire file one 4 KiB block at a
+# time. This is the closest analogue to "one particle samples one grid point".
+[global]
+ioengine=psync
+direct=1
+invalidate=1
+group_reporting=1
+filename=${TESTFILE}
+time_based=1
+runtime=30
+
+[rand-read-4k]
+rw=randread
+bs=4k
+size=${SIZE}
+norandommap
+random_generator=tausworthe64

@@ -1,0 +1,30 @@
+=== fio sequential vs random read benchmark ===
+test file : /mnt/nvme0/parcels-demo/01_fio/fio_testfile.bin
+size      : 10G
+fio       : pixi exec --spec fio fio
+
+Creating 10G test file (one-time)...
+done.
+
+>>> seq_read_1M
+    bandwidth :   2083.3 MB/s
+    IOPS      :       1987
+    mean lat  :    502.0 us
+
+>>> rand_read_1M
+    bandwidth :   2052.1 MB/s
+    IOPS      :       1957
+    mean lat  :    508.5 us
+
+>>> rand_read_4k
+    bandwidth :     56.4 MB/s
+    IOPS      :      13777
+    mean lat  :     71.1 us
+
+Raw fio JSON saved under /home/joe/Projects/Geomar-Utrecht/Parcels/demos/dask-performance/01_fio/results/
+Summary table:
+pattern                   MB/s          IOPS    vs seq
+------------------------------------------------------
+sequential 1 MiB        2083.3          1987     1.00x
+random 1 MiB            2052.1          1957     0.99x
+random 4 KiB              56.4         13777     0.03x

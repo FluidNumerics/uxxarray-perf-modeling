@@ -1,0 +1,15 @@
+# Sequential read of the whole test file with O_DIRECT (bypasses the OS page
+# cache so we measure the storage device, not RAM). Large block size (1 MiB)
+# is the best case for any storage medium: the disk head / SSD controller
+# streams contiguous data.
+[global]
+ioengine=psync
+direct=1
+invalidate=1
+group_reporting=1
+filename=${TESTFILE}
+
+[seq-read-1M]
+rw=read
+bs=1M
+size=${SIZE}

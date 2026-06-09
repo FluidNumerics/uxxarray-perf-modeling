@@ -1,0 +1,5 @@
+=== Atlantic reproducer: 59 files, 20.1 GiB total ===
+  window (numpy, in RAM)    :      0.30 s  (200 particles x 48 steps, 31,720 steps/s)
+  full series (dask, lazy)  :      8.11 s  (200 particles x 48 steps, 1,183 steps/s)
+
+  lazy dask over the full series is 26.8x slower than loading just the 2-day window into RAM.

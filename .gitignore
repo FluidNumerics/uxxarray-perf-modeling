@@ -1,0 +1,15 @@
+# Generated benchmark *data* -- regenerate with the make_*.py scripts. These can
+# be large (10s of GB) and/or machine-specific (data/ is often a symlink to a
+# scratch disk), so they are never committed.
+**/data
+**/data/
+01_fio/fio_testfile.bin
+*.nc
+*.zarr
+
+# NOTE: results/ (the measured benchmark outputs) ARE committed -- they are the
+# evidence the READMEs reference.
+
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
