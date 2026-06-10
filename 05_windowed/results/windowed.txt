@@ -1,0 +1,10 @@
+=== windowed vs naive sampling on 59 files (20 GiB) ===
+grid 1320x1440, slab 15.2 MB/level (U+V)
+run 7 d @ dt=10 min -> 1008 steps, spanning 169 hourly levels, 500 particles (prefetch=True)
+
+correctness check: max |naive - window| over 20 steps = 0.00e+00  (OK)
+
+  naive  (dask isel().compute()/step) :     64.10 s  (   15.7 steps/s, ~ 28.6 GiB read, 2016 compute graphs)
+  window (NumPy + rolling reload)     :     11.33 s  (   89.0 steps/s,   2.4 GiB read, 169 level loads)
+
+  window is 6x faster, and reads 12x less data off disk.

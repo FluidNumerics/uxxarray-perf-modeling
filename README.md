@@ -15,6 +15,7 @@ It builds the argument in three stages, each runnable on its own:
 | [`02_xarray_dask/`](02_xarray_dask/) | xarray/dask: sequential streaming vs scattered `isel().compute()` | mini-app |
 | [`03_parcels/`](03_parcels/) | a real Parcels advection, dask-backed vs in-memory (+ the dask scheduling-overhead writeup) | Parcels |
 | [`04_atlantic/`](04_atlantic/) | production-scale (~20 GB, 1/12° Atlantic, GLORYS-like) reproducer: lazy dask vs in-RAM time window | Parcels |
+| [`05_windowed/`](05_windowed/) | **the fix** — rolling NumPy time-window cache (dask for bulk loads, NumPy in the hot loop) vs naive lazy dask | prototype |
 
 See **[Setup](#setup)** for the environment. Run everything with
 [`run_all.sh`](run_all.sh) (`SMALL=1 ./run_all.sh` for a quick ~5 GB laptop pass),
