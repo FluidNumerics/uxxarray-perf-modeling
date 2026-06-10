@@ -1,0 +1,16 @@
+scattered gather of 2000 points from an in-RAM (48,600,600) field (no disk I/O)
+default graph: 96 tasks (chunks (1,n,n)); single-chunk: 3 tasks
+
+  configuration                              ms/call   x numpy  x default
+  ----------------------------------------------------------------------
+  numpy baseline                               0.339        1x           
+  threads (default)                           53.945      159x       1.0x
+  scheduler="synchronous"                      8.381       25x       6.4x
+  threads, optimize_graph=False               24.235       71x       2.2x
+  synchronous + no-optimize                    8.601       25x       6.3x
+  synchronous + single-chunk (3 tasks)         6.394       19x       8.4x
+  synchronous, batched x10 (per gather)        9.633       28x       5.6x
+
+floor: every .compute() still rebuilds + tokenizes a graph, so even fully
+tuned this stays ~50x numpy. Closing the gap to 1x needs the windowed
+NumPy approach (stage 05) -- stop calling compute per gather.

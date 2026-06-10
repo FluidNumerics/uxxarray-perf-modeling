@@ -57,6 +57,17 @@ pixi exec --spec py-spy py-spy record --format speedscope \
 
 (`--tool none` makes the script just run the loop; py-spy profiles it externally.)
 
+## Dask-only knobs — how far can tuning get you?
+
+[`scheduler_knobs.py`](scheduler_knobs.py) (`pixi run knobs`) times the same
+in-RAM gather under dask-internal configurations — `scheduler="synchronous"`,
+`optimize_graph=False`, fewer/larger chunks, and batching. Captured run in
+[`results/scheduler_knobs.txt`](results/). Headline: staying inside dask,
+`synchronous` + larger chunks cut the per-gather overhead ~6–12× (the thread-pool
+lock/condition storm is the bulk of it). But every `.compute()` still rebuilds and
+tokenizes a graph, so it bottoms out around ~50× NumPy — tuning narrows the gap,
+the windowed approach (stage 05) closes it.
+
 ## Reading the result
 
 All three converge on the same story: with the data in RAM, time is spent
