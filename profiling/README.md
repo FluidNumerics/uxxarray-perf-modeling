@@ -68,6 +68,25 @@ lock/condition storm is the bulk of it). But every `.compute()` still rebuilds a
 tokenizes a graph, so it bottoms out around ~50× NumPy — tuning narrows the gap,
 the windowed approach (stage 05) closes it.
 
+## Fewer `.compute()` calls? (batching velocity components)
+
+Parcels samples each velocity component separately — `XLinear_Velocity` calls
+`XLinear` for U, then V, then W, and each ends in its own `value.compute()` — so a
+3-D RK2 step issues ~6 `.compute()` calls. [`batched_compute.py`](batched_compute.py)
+(`pixi run batched`) tests collapsing them into one `dask.compute(u, v, w)`.
+Captured run in [`results/batched_compute.txt`](results/).
+
+**Finding (worth flagging — it corrects the intuition):** batching reduces the
+*call count* (6 → 2 for RK2-3D) but **not** wall time (~1.05× threads, neutral
+under synchronous). The cost is **per-task**, not per-`.compute()`-call: merging
+three components into one graph just yields one graph with 3× the tasks, so the
+scheduler does the same total work. The dask-only lever that *does* move the
+needle is the **scheduler** (synchronous ≈ 2× here) plus fewer/larger chunks
+(see `scheduler_knobs.py`) — not the number of calls. Batching is still worth
+doing for cleaner code and to pair with `dask.compute(..., scheduler=...)`, but
+it isn't a speedup by itself. (You also can't batch across RK stages — they're
+sequential.) Closing the gap still needs the in-RAM window (stage 05).
+
 ## Reading the result
 
 All three converge on the same story: with the data in RAM, time is spent

@@ -24,6 +24,7 @@ viztracer = "*"
 
 [tasks]
 knobs = "python scheduler_knobs.py --npart 2000 --iters 100"
+batched = "python batched_compute.py --ncomp 3 --npart 2000 --iters 100"
 cprofile = "python profile_dask.py --ncalls 200 --tool cprofile"
 trace = "python profile_dask.py --ncalls 20 --tool viztracer"
 view = "vizviewer results/dask_trace.json"

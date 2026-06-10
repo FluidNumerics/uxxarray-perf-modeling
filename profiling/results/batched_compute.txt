@@ -1,0 +1,33 @@
+3-component velocity gather, 2000 particles, in-RAM field (12,1,600,600), scheduler=threads
+(each component gather is a 25-task graph)
+
+  separate  (3 x .compute())   :   169.98 ms   [3 graphs built/scheduled]
+  batched   (1 x dask.compute())  :   159.92 ms   [1 graph]
+  -> 1.06x faster per velocity evaluation
+
+  AdvectionRK2: 6 compute() -> 2 per step (3x fewer); per-step sample time 340.0 -> 319.8 ms
+  AdvectionRK4: 12 compute() -> 4 per step (3x fewer); per-step sample time 679.9 -> 639.7 ms
+
+fewer calls, but still 1 graph per RK stage (stages are sequential -- the midpoint depends on the previous velocity). Removing the last graphs needs the in-RAM window (stage 05).
+2-component velocity gather, 2000 particles, in-RAM field (12,1,600,600), scheduler=threads
+(each component gather is a 25-task graph)
+
+  separate  (2 x .compute())   :   112.93 ms   [2 graphs built/scheduled]
+  batched   (1 x dask.compute())  :   110.15 ms   [1 graph]
+  -> 1.03x faster per velocity evaluation
+
+  AdvectionRK2: 4 compute() -> 2 per step (2x fewer); per-step sample time 225.9 -> 220.3 ms
+  AdvectionRK4: 8 compute() -> 4 per step (2x fewer); per-step sample time 451.7 -> 440.6 ms
+
+fewer calls, but still 1 graph per RK stage (stages are sequential -- the midpoint depends on the previous velocity). Removing the last graphs needs the in-RAM window (stage 05).
+3-component velocity gather, 2000 particles, in-RAM field (12,1,600,600), scheduler=synchronous
+(each component gather is a 25-task graph)
+
+  separate  (3 x .compute())   :    82.03 ms   [3 graphs built/scheduled]
+  batched   (1 x dask.compute())  :    85.32 ms   [1 graph]
+  -> 0.96x faster per velocity evaluation
+
+  AdvectionRK2: 6 compute() -> 2 per step (3x fewer); per-step sample time 164.1 -> 170.6 ms
+  AdvectionRK4: 12 compute() -> 4 per step (3x fewer); per-step sample time 328.1 -> 341.3 ms
+
+fewer calls, but still 1 graph per RK stage (stages are sequential -- the midpoint depends on the previous velocity). Removing the last graphs needs the in-RAM window (stage 05).
