@@ -1,0 +1,29 @@
+# Fresh environment for profiling the dask scheduling overhead.
+#
+#   pixi run cprofile   # deterministic function breakdown (-> results/dask_sampling.prof)
+#   pixi run trace      # VizTracer timeline trace (-> results/dask_trace.json)
+#   pixi run view       # open the trace in the Perfetto-based viewer
+#   pixi run pyspy      # zero-overhead sampling trace -> speedscope JSON
+#
+# Array stack + the profilers. No Parcels needed (the probe builds its own
+# in-RAM field). py-spy comes from conda-forge; viztracer from PyPI.
+[workspace]
+name = "uxxperf-profiling"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[dependencies]
+python = ">=3.11"
+numpy = ">=2.1.0"
+xarray = ">=2024.5.0"
+dask = ">=2024.5.1"
+py-spy = "*"
+
+[pypi-dependencies]
+viztracer = "*"
+
+[tasks]
+cprofile = "python profile_dask.py --ncalls 200 --tool cprofile"
+trace = "python profile_dask.py --ncalls 20 --tool viztracer"
+view = "vizviewer results/dask_trace.json"
+pyspy = "py-spy record --format speedscope -o results/dask_sampling.speedscope.json -- python profile_dask.py --ncalls 500 --tool none"

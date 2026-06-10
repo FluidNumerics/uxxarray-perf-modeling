@@ -211,21 +211,33 @@ into RAM (a couple of days ≈ 1 GB). Details and numbers:
 
 ## Setup
 
-You need a Python environment with **Parcels v4** (alpha) plus `xarray`, `dask`,
-`netcdf4`, and `fio`. Two options:
+**Each stage is self-contained: it has its own `pixi.toml` defining a fresh
+environment and run tasks.** With [pixi](https://pixi.sh) installed:
+
+```bash
+cd 02_xarray_dask && pixi run make-slab && pixi run bench-slab
+cd 03_parcels     && pixi run make-fieldset && pixi run bench   # pulls Parcels v4 from git
+cd 04_atlantic    && pixi run make && pixi run bench
+cd 05_windowed    && pixi run bench
+cd 01_fio         && pixi run bench
+cd profiling      && pixi run cprofile     # or: pixi run trace  (VizTracer timeline)
+```
+
+`pixi install` (run automatically by `pixi run`) builds the env from conda-forge;
+the parcels stages add **Parcels v4** (alpha) from git as a PyPI dependency, with
+its requirements satisfied by the conda packages. `pixi run <task>` lists in each
+stage's `pixi.toml`; `pixi run <any-cmd>` runs an arbitrary command in the env.
+
+Alternatives if you don't use pixi:
 
 ```bash
 # (a) conda/mamba -- best-effort, installs Parcels v4 from git
-conda env create -f environment.yml
-conda activate uxxarray-perf-modeling
-
-# (b) reuse the pixi env of an existing Parcels v4 checkout (most reliable):
+conda env create -f environment.yml && conda activate uxxarray-perf-modeling
+# (b) reuse the pixi env of an existing Parcels v4 checkout:
 export PARCELS_PYTHON=/path/to/parcels/.pixi/envs/default/bin/python
 ```
 
 `run_all.sh` uses `$PARCELS_PYTHON` if set, otherwise the `python` on `PATH`.
-`fio` is in `environment.yml`; `01_fio/run.sh` also falls back to a system `fio`
-or `pixi exec fio` if available.
 
 ## Reproducing
 

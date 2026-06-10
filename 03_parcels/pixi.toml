@@ -1,0 +1,39 @@
+# Fresh, self-contained environment for stage 03 (Parcels dask-vs-in-memory +
+# the dask scheduling-overhead probe).
+#
+#   pixi run make-fieldset    # generate the synthetic SGRID field
+#   pixi run bench            # dask-backed vs in-memory advection (slow dask pass!)
+#   pixi run overhead         # in-RAM dask vs numpy per-call overhead
+#
+# The heavy scientific stack comes from conda-forge; Parcels v4 (alpha) is
+# installed from git as a PyPI dependency, with its requirements satisfied by the
+# conda packages below.
+[workspace]
+name = "uxxperf-03-parcels"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[dependencies]
+python = ">=3.11"
+numpy = ">=2.1.0"
+dask = ">=2024.5.1"
+netcdf4 = ">=1.7.2"
+xarray = ">=2024.5.0"
+zarr = ">=3"
+pandas = ">=2.2"
+pyarrow = ">=20.0.0"
+uxarray = ">=2026.04.1"
+xgcm = ">=0.9.0"
+cf_xarray = ">=0.8.6"
+cftime = ">=1.6.3"
+pooch = ">=1.8.0"
+polars = ">=1.31.0"
+tqdm = ">=4.50.0"
+
+[pypi-dependencies]
+parcels = { git = "https://github.com/Parcels-Code/Parcels.git" }
+
+[tasks]
+make-fieldset = "python make_fieldset.py --nx 1000 --ny 1000 --nt 60 --out data/flow.nc"
+bench = "python run_parcels.py --file data/flow.nc --npart 2000 --runtime-days 20 --mode both"
+overhead = "python dask_overhead.py --npart 2000 --ncalls 50"

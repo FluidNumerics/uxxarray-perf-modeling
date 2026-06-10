@@ -1,0 +1,21 @@
+# Fresh environment for stage 05 (rolling time-window prototype).
+#
+#   pixi run bench   # rolling NumPy window vs naive lazy-dask sampling
+#
+# No Parcels needed -- this stage benchmarks the loader strategy directly, so it
+# only needs the array/IO stack. It reads the stage-04 dataset, so generate that
+# first (see ../04_atlantic) or point --dir at any matching NetCDF series.
+[workspace]
+name = "uxxperf-05-windowed"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[dependencies]
+python = ">=3.11"
+numpy = ">=2.1.0"
+xarray = ">=2024.5.0"
+dask = ">=2024.5.1"
+netcdf4 = ">=1.7.2"
+
+[tasks]
+bench = "python bench_windowed.py --dir ../04_atlantic/data/atlantic --days 7 --dt-min 10 --npart 500 --mode both --prefetch --check"

@@ -1,0 +1,25 @@
+# Fresh environment for stage 02 (xarray/dask sampling: read amplification).
+#
+#   pixi run make-slab    # generate the 10 GiB slab-chunked dataset
+#   pixi run make-tiled   # generate the 10 GiB tile-chunked dataset
+#   pixi run bench-slab   # scattered isel().compute() vs load-once on slab chunks
+#   pixi run bench-tiled  # same on tiny tile chunks (the 4 KiB-random analog)
+#
+# Array/IO stack only -- no Parcels.
+[workspace]
+name = "uxxperf-02-xarray-dask"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[dependencies]
+python = ">=3.11"
+numpy = ">=2.1.0"
+xarray = ">=2024.5.0"
+dask = ">=2024.5.1"
+netcdf4 = ">=1.7.2"
+
+[tasks]
+make-slab = "python make_dataset.py --gb 10 --chunk slab  --out data/ocean_slab_10g.nc"
+make-tiled = "python make_dataset.py --gb 10 --chunk tiled --out data/ocean_tiled_10g.nc"
+bench-slab = "python bench_sampling.py --file data/ocean_slab_10g.nc  --npart 10000 --nsteps 50 --drop-caches"
+bench-tiled = "python bench_sampling.py --file data/ocean_tiled_10g.nc --npart 10000 --nsteps 50 --drop-caches"

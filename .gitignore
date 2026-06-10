@@ -19,3 +19,11 @@ __pycache__/
 profiling/results/*.json
 profiling/results/*.prof
 profiling/results/*.svg
+
+# pixi environments and lockfiles -- each stage has its own pixi.toml; envs are
+# regenerated with `pixi install`. (Lockfiles omitted because Parcels is pulled
+# from git and would otherwise pin a moving alpha.)
+.pixi/
+**/.pixi/
+pixi.lock
+**/pixi.lock

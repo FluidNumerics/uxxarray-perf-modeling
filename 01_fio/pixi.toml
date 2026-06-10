@@ -1,0 +1,20 @@
+# Fresh environment for stage 01 (raw storage: sequential vs random read).
+#
+#   pixi run bench    # lays out a 10 GiB file and runs seq/random reads (O_DIRECT)
+#
+# Just needs fio (provided here from conda-forge) and python for the JSON parsing
+# in run.sh. This stage is Linux-specific anyway -- it relies on O_DIRECT and
+# /proc/sys/vm/drop_caches -- and conda-forge `fio` isn't built for macOS, so the
+# environment is pinned to linux-64.
+# Override size/target: TESTFILE=/path SIZE=10G pixi run bench
+[workspace]
+name = "uxxperf-01-fio"
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+[dependencies]
+python = ">=3.11"
+fio = "*"
+
+[tasks]
+bench = "bash run.sh"
