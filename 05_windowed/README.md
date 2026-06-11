@@ -67,3 +67,31 @@ python bench_windowed.py --dir ../04_atlantic/data/atlantic \
   `field.eval` samples a resident NumPy window and refreshes/prefetches on time
   advance — transparent to users, and the real fix. This prototype is the
   reference for what that layer should do (and the before/after to justify it).
+
+## Transparent drop-in: `WindowedArray` (`pixi run windowed-array`)
+
+[`windowed_array.py`](windowed_array.py) shows how to make the window
+**transparent behind xarray's `.isel`** — no interpolator changes. It wraps the
+lazy DataArray and overrides `isel`/`sel` to: find the requested time levels,
+load the missing ones to NumPy (one bulk read each), **retire** levels below the
+current minimum (the clock only moves forward), and do the gather on the small
+resident block. Everything else (`.dims`, `.shape`, `.coords`, …) forwards to the
+wrapped array.
+
+The trick: the result is **NumPy**, so Parcels' interpolator —
+`data.isel(sel).data.reshape(...)` then `value.compute() if
+is_dask_collection(value) else value` — automatically skips `.compute()`. So a
+single line at FieldSet construction,
+
+```python
+field.data = WindowedArray(field.data)   # drop-in; assumes all particles share the clock
+```
+
+removes **both** the per-step re-reads and the dask scheduling tax with no other
+code change. Verified ([`results/windowed_array_demo.txt`](results/)): identical
+values to dask (`max |Δ| = 0`), each time level loaded **once** (20 loads for 60
+steps vs 120 naive gathers), and at most **2 levels resident** at any time.
+
+(Two alternatives, noted for completeness: `dask.cache.Cache(...).register()` is
+zero-code but only removes re-reads, not the scheduler tax; a custom xarray
+`BackendArray` duck-array is the most robust but more plumbing.)

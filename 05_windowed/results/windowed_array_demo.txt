@@ -1,0 +1,5 @@
+steps: 60 over 20 time levels, 1000 particles
+correctness : max |windowed - dask| = 0.00e+00  (OK)
+transparency: same .isel(...) API; result is NumPy (is_dask_collection -> .compute() skipped)
+loads       : 20 level loads for 60 steps (vs 120 dask gathers naively)
+memory      : max 2 time levels resident at once (stale levels retired)

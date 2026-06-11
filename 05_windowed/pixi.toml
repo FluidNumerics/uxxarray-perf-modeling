@@ -19,3 +19,4 @@ netcdf4 = ">=1.7.2"
 
 [tasks]
 bench = "python bench_windowed.py --dir ../04_atlantic/data/atlantic --days 7 --dt-min 10 --npart 500 --mode both --prefetch --check"
+windowed-array = "python windowed_array.py"
