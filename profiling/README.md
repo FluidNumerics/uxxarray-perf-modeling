@@ -87,6 +87,34 @@ doing for cleaner code and to pair with `dask.compute(..., scheduler=...)`, but
 it isn't a speedup by itself. (You also can't batch across RK stages — they're
 sequential.) Closing the gap still needs the in-RAM window (stage 05).
 
+## Chunk size: the scheduler-vs-amplification tradeoff
+
+[`chunk_size_sweep.py`](chunk_size_sweep.py) (`pixi run sweep`) sweeps the chunk
+edge for a scattered gather and reports both sides at once. Captured run in
+[`results/chunk_size_sweep.txt`](results/):
+
+```
+chunk (t,y,x)     #chunks  #tasks  ms/call  read-amp
+(1, 64, 64)          4332   10902  1676.20    1565x
+(1, 128, 128)        1200    2385   476.42    1940x
+(1, 300, 300)         192     385    99.71    1728x
+(1, 600, 600)          48      97    39.11    1728x
+(1, 1200, 1200)        12      25    22.66    1728x
+```
+
+Bigger chunks → far fewer tasks → ~74× faster *in-RAM* sampling (10902→25 tasks,
+1676→23 ms). But **read amplification doesn't improve** (~1700×) — for scattered
+access each touched chunk still drags its whole self off disk, and the naive path
+re-reads it every step. So on the lazy-off-disk path, bigger chunks just trade
+scheduler overhead for read amplification; neither extreme wins.
+
+**Conclusion:** large chunks only pay off if you read the chunk into memory
+**once, reuse it, and toss it** — amortizing the big read over all particles and
+sub-steps in that time interval, with low task count. And note `dask.persist()`
+keeps it resident but still samples through the scheduler (~200× NumPy); the full
+win is materializing to **NumPy** and indexing that. That combination — big
+chunks + load-to-NumPy + reuse + evict — is exactly the stage-05 rolling window.
+
 ## Reading the result
 
 All three converge on the same story: with the data in RAM, time is spent
